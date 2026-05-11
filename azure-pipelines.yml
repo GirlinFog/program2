@@ -19,7 +19,7 @@ steps:
 # Copy JAR/WAR files into artifact staging directory
 - task: CopyFiles@2
   inputs:
-    contents: '**/target/*.war'
+    contents: '**/target/*.jar'
     targetFolder: '$(Build.ArtifactStagingDirectory)'
 
 # Publish the artifacts
