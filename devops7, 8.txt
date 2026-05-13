@@ -1,0 +1,104 @@
+Expirement 7
+
+1.wsl --list  --verbose
+2.wsl --unregister Ubuntu
+3.dism /online /disable-feature /featurename:Microsoft-Windows-Subsystem-Linux /norestart
+4.dism /online/ disable-feature /featurename:VirtualMachinePlatform /norestart
+5. restart
+6. wsl
+7. wsl --ubuntu -d Ubuntu
+8. restart
+9. wsl --install
+   username and password
+10. wsl
+11. wsl --list  --verbose
+
+After giving wsl -d Ubuntu 
+• You will get start to wsl of ubuntu and give cmd as sudo apt update
+
+12. wsl -d Ubuntu
+         |
+         |_______>1.sudo apt update
+                  2.sudo apt install ansible -y 
+                  3.ansible --version
+                  4.mkdir ~/ansible-lab 
+                  5.cd ~/ansible-lab 
+
+                  6.nano hosts 
+
+Paste this: 
+[local] 
+localhost ansible_connection=local 
+Save → 
+CTRL + O→   ENTER   CTRL+X  → ENTER 
+
+                  7.ansible -i hosts local -m ping
+
+                  8.nano install_nginx.yml 
+
+Paste ONLY this :
+---
+- name: Install and start NGINX
+  hosts: local
+  become: yes
+
+  tasks:
+    - name: Install nginx
+      apt:
+        name: nginx
+        state: present
+        update_cache: yes
+
+    - name: Start nginx service
+      service:
+        name: nginx
+        state: started
+        enabled: yes
+
+Save file. 
+CTRL + O→   ENTER   CTRL+X  → ENTER
+
+                  9.ansible-playbook install_nginx.yml --syntax-check
+ 
+Now I will get error because I am doing in prompt ,because I am not doing in WSL directly 
+
+10.ansible-playbook -i hosts install_nginx.yml 
+11.ansible-playbook -i hosts install_nginx.yml --ask-become-pass
+12.sudo -k
+13.sudo whoami (ans root)
+14.groups
+15.sudo visudo
+   |____>1.jesy_jeff_laura ALL=(ALL) NOPASSWD: ALL
+Add this line at the bottom:
+Save file. 
+CTRL + O→   ENTER   CTRL+X  → ENTER
+
+16.ansible-playbook -i hosts install_nginx.yml 
+17. exit
+
+
+Expirement 8
+
+# ─────────────────────────────────────────────────
+#  Stage 1 – Build: Copy static website assets
+# ─────────────────────────────────────────────────
+FROM nginx:alpine
+# Maintainer label
+LABEL maintainer="girlinfog" \
+      project="program2-master" \
+      description="Tripillar Solutions static website served via Nginx"
+# Remove default Nginx welcome page
+RUN rm -rf /usr/share/nginx/html/*
+# Copy static website files into Nginx's serving directory
+COPY src/main/resources/index.html    /usr/share/nginx/html/index.html
+COPY src/main/resources/styles.css    /usr/share/nginx/html/styles.css
+COPY src/main/resources/logo-bit.jpg.jpeg   /usr/share/nginx/html/logo-bit.jpg.jpeg
+# Expose port 80 (Nginx default)
+EXPOSE 80
+# Start Nginx in the foreground (required for Docker)
+CMD ["nginx", "-g", "daemon off;"]
+
+
+1. docker build -t program2-master-web:latest .
+2. docker run -d -p 8080:80 --name devops-web-app1 program2-master-web:latest
+3. docker ps
